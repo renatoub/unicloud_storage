@@ -1,0 +1,32 @@
+[project]
+name = "unicloud-storage"
+version = "0.1.0"
+description = "A unified Python library for interacting with AWS S3, Google Cloud Storage (GCS), and Azure Blob Storage."
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "azure-storage-blob (>=12.26.0,<13.0.0)",
+    "google-cloud-storage (>=3.3.1,<4.0.0)",
+    "azure-identity (>=1.24.0,<2.0.0)",
+    "boto3 (>=1.40.27,<2.0.0)",
+    "pandas (>=2.3.2,<3.0.0)",
+    "pyarrow (>=21.0.0,<22.0.0)",
+    "docutils (>=0.22,<0.23)",
+    "types-boto3 (>=1.40.27,<2.0.0)"
+
+]
+
+[project.urls]
+"Homepage" = "https://github.com/example/cloud_storage_lib"
+"Bug Tracker" = "https://github.com/example/cloud_storage_lib/issues"
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-mock",
+]
