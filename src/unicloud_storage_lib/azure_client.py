@@ -1,11 +1,11 @@
 import os
 import io
 from typing import Any, Dict, List, Optional, Union
-import pandas as pd
+import polars as pl
 from azure.core.exceptions import AzureError
 from azure.identity import UsernamePasswordCredential
 from azure.storage.blob import BlobServiceClient
-from .base import BaseStorageClient, ConnectionError, DownloadError, UploadError, FileNotFoundError
+from .base import BaseStorageClient, ConnectionError, DownloadError, UploadError, FileNotFoundError, DataFrame
 
 class AzureStorageClient(BaseStorageClient):
     def __init__(self, auth_config: Dict[str, Any]):
@@ -202,7 +202,7 @@ class AzureStorageClient(BaseStorageClient):
 
     def upload_dataframe(
         self,
-        dataframe: pd.DataFrame,
+        dataframe: DataFrame,
         bucket_name: str,
         destination_blob_name: str,
         file_format: str = "parquet",
@@ -218,11 +218,11 @@ class AzureStorageClient(BaseStorageClient):
 
         buffer = io.BytesIO()
         if file_format == "parquet":
-            dataframe.to_parquet(buffer, index=False)
+            dataframe.write_parquet(buffer)
         elif file_format == "csv":
-            dataframe.to_csv(buffer, index=False)
+            dataframe.write_csv(buffer)
         elif file_format == "json":
-            dataframe.to_json(buffer, orient="records", lines=True)
+            dataframe.write_json(buffer, row_oriented=True)
         else:
             raise ValueError(f"Unsupported file format: {file_format}")
 
@@ -234,7 +234,7 @@ class AzureStorageClient(BaseStorageClient):
         bucket_name: str,
         blob_name: str,
         file_format: str = "parquet",
-    ) -> pd.DataFrame:
+    ) -> DataFrame:
         try:
             blob_client = self._client.get_blob_client(container=bucket_name, blob=blob_name)
             if not blob_client.exists():
@@ -246,11 +246,11 @@ class AzureStorageClient(BaseStorageClient):
             raise DownloadError(f"Failed to read file from Azure: {e}") from e
 
         if file_format == "parquet":
-            return pd.read_parquet(buffer)
+            return pl.read_parquet(buffer)
         elif file_format == "csv":
-            return pd.read_csv(buffer)
+            return pl.read_csv(buffer)
         elif file_format == "json":
-            return pd.read_json(buffer, orient="records", lines=True)
+            return pl.read_json(buffer)
         else:
             raise ValueError(f"Unsupported file format: {file_format}")
 

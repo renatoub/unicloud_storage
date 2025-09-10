@@ -1,6 +1,11 @@
 from abc import ABC, abstractmethod
 from typing import Any, List, Optional, Union
-import pandas as pd
+
+try:
+    import polars as pl
+    DataFrame = pl.DataFrame
+except ImportError:
+    DataFrame = Any
 
 class StorageClientError(Exception):
     """Base exception for storage client errors."""
@@ -107,21 +112,21 @@ class BaseStorageClient(ABC):
     @abstractmethod
     def upload_dataframe(
         self,
-        dataframe: pd.DataFrame,
+        dataframe: DataFrame,
         bucket_name: str,
         destination_blob_name: str,
         file_format: str = "parquet",
         overwrite: bool = False,
         create_folder: bool = True,
     ) -> None:
-        """Uploads a pandas DataFrame."""
+        """Uploads a Polars DataFrame."""
         pass
 
     @abstractmethod
     def read_dataframe(
         self, bucket_name: str, blob_name: str, file_format: str = "parquet"
-    ) -> pd.DataFrame:
-        """Reads a file from storage into a pandas DataFrame."""
+    ) -> DataFrame:
+        """Reads a file from storage into a Polars DataFrame."""
         pass
 
     @abstractmethod
